@@ -1,7 +1,6 @@
 const S=Shifti, STORAGE_KEY='jadwal_dawam_v2';
 const $id=id=>document.getElementById(id);
 const salarySummaryPage=$id('salarySummaryPage');
-const salarySettingsPage=$id('salarySettingsPage');
 const salaryFrom=$id('salaryFrom');
 const salaryTo=$id('salaryTo');
 const thisMonthBtn=$id('thisMonthBtn');
@@ -17,12 +16,6 @@ const salaryReview=$id('salaryReview');
 const salaryBreakdown=$id('salaryBreakdown');
 const salaryStats=$id('salaryStats');
 const salaryDays=$id('salaryDays');
-const shiftChanges=$id('shiftChanges');
-const salaryIncreases=$id('salaryIncreases');
-const addShiftChange=$id('addShiftChange');
-const addSalaryIncrease=$id('addSalaryIncrease');
-const exportSalary=$id('exportSalary');
-const importSalary=$id('importSalary');
 
 const WEEKDAYS=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 const DEFAULT_STATE={version:2,settings:{baseSalary:0,socialSecurityBase:0,socialSecurityRate:.075,savingsRate:0,takaful:0,dailyHours:9.6,otWorkMultiplier:1.25,otHolidayMultiplier:1.5,salaryDivisorDays:30,nightAllowance:0,cycleStartShift:'مسائي',cycleStartDate:'2026-07-02',weeklyOff1:'الثلاثاء',weeklyOff2:'الأربعاء',deductAbsence:false,deductShortage:false,sickBalance:14,casualBalance:0,transportAllowance:0,otDivisorHours:8,shiftSystem:'تناوب أسبوعي'},period:defaultPeriod(),shiftChanges:[],salaryIncreases:[],records:{}};
@@ -42,15 +35,25 @@ function render(){state=load();const from=salaryFrom.value,to=salaryTo.value;if(
  const br=[['الراتب الأساسي للفترة',x.base],['بدل المواصلات',x.transport],['بدل المسائي',x.night],['إضافي 1.25',x.ot125],['إضافي 1.50',x.ot150],['الإجمالي قبل الخصم',x.gross,'total'],['الضمان',x.social,'deduct'],['صندوق الادخار',x.savings,'deduct'],['تكافل',x.takaful,'deduct'],['خصم الغياب/بدون راتب',x.absence,'deduct'],['خصم التأخير/المغادرة',x.shortage,'deduct'],['إجمالي الخصومات',x.deductions,'total deduct']];salaryBreakdown.innerHTML=br.map(v=>`<div class="break-row ${v[2]||''}"><span>${v[0]}</span><strong>${money(v[1])}</strong></div>`).join('');
  const st=[['وقت الحضور الفعلي',hm(x.stats.actual)],['الساعات الطبيعية المحسوبة',hm(x.stats.normal)],['إضافي 1.25',hm(x.stats.ot125h)],['إضافي 1.50',hm(x.stats.ot150h)],['النقص',hm(x.stats.shortageH)],['أيام دوام مسجلة',x.stats.workRecorded],['أيام مسائي مسجلة',x.stats.nightDays],['عطل رسمية',x.stats.official]];salaryStats.innerHTML=st.map(v=>`<div class="sf-kpi"><span>${v[0]}</span><strong>${v[1]}</strong></div>`).join('');
  salaryDays.innerHTML=x.rows.map(r=>{const val=r.ot125Value+r.ot150Value;const times=r.r.in||r.r.out?`${r.r.in||'—'} ← ${r.r.out||'—'}`:'بدون وقت';return`<div class="sf-row"><div class="day-salary"><div class="main"><h3>${wd(r.date)} · ${S.fmt(r.date,{day:'2-digit',month:'2-digit'})}</h3><p>${r.type} · ${r.sh} · ${times}</p></div><div class="money">${val?`+ ${money(val)}`:'—'}</div></div><div class="sf-meta"><span class="sf-badge ${r.status==='مكتمل'?'green':r.status==='قادم'?'':'amber'}">${r.status}</span>${r.shortage?`<span class="sf-badge amber">نقص ${Math.round(r.shortage*60)}د</span>`:''}${r.ot125+r.ot150?`<span class="sf-badge teal">إضافي ${hm(r.ot125+r.ot150)}</span>`:''}${r.r.notes?`<span class="sf-badge">ملاحظة</span>`:''}</div></div>`}).join('')||'<div class="sf-empty">اختر فترة لعرض التفاصيل.</div>'}
-function fillWeekdays(){document.querySelectorAll('.weekday-select').forEach(e=>e.innerHTML=WEEKDAYS.map(w=>`<option>${w}</option>`).join(''))}
-function settings(){state=load();fillWeekdays();document.querySelectorAll('[data-setting]').forEach(e=>e.value=state.settings[e.dataset.setting]??'');document.querySelectorAll('[data-percent]').forEach(e=>e.value=(Number(state.settings[e.dataset.percent])||0)*100);document.querySelectorAll('[data-bool]').forEach(e=>e.checked=!!state.settings[e.dataset.bool]);renderChanges();renderIncreases()}
-function renderChanges(){shiftChanges.innerHTML=(state.shiftChanges||[]).length?state.shiftChanges.map((x,i)=>`<div class="change-row" data-i="${i}"><label>ساري من<input type="date" data-f="effectiveFrom" value="${x.effectiveFrom||''}"></label><label>عطلة 1<select data-f="weeklyOff1">${WEEKDAYS.map(w=>`<option ${w===x.weeklyOff1?'selected':''}>${w}</option>`).join('')}</select></label><label>عطلة 2<select data-f="weeklyOff2">${WEEKDAYS.map(w=>`<option ${w===x.weeklyOff2?'selected':''}>${w}</option>`).join('')}</select></label><label>النظام<select data-f="shiftSystem"><option ${x.shiftSystem==='تناوب أسبوعي'?'selected':''}>تناوب أسبوعي</option><option ${x.shiftSystem==='صباحي فقط'?'selected':''}>صباحي فقط</option><option ${x.shiftSystem==='مسائي فقط'?'selected':''}>مسائي فقط</option></select></label><label>البداية<select data-f="cycleStartShift"><option ${x.cycleStartShift==='صباحي'?'selected':''}>صباحي</option><option ${x.cycleStartShift==='مسائي'?'selected':''}>مسائي</option></select></label><button class="delete-mini" data-del="${i}">حذف</button></div>`).join(''):'<div class="sf-note">ما في تغييرات إضافية. النظام الأساسي بالأعلى هو المستخدم.</div>';shiftChanges.querySelectorAll('[data-f]').forEach(e=>e.onchange=()=>{const i=+e.closest('.change-row').dataset.i;state.shiftChanges[i][e.dataset.f]=e.value;save();render()});shiftChanges.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{state.shiftChanges.splice(+b.dataset.del,1);save();renderChanges();render()})}
-function renderIncreases(){salaryIncreases.innerHTML=(state.salaryIncreases||[]).length?state.salaryIncreases.map((x,i)=>`<div class="change-row" data-i="${i}" style="grid-template-columns:1fr 1fr auto"><label>ساري من<input type="date" data-if="effectiveFrom" value="${x.effectiveFrom||''}"></label><label>مبلغ الزيادة<input type="number" step="0.001" data-if="amount" value="${x.amount||0}"></label><button class="delete-mini" data-idel="${i}">حذف</button></div>`).join(''):'<div class="sf-note">ما في زيادات راتب مسجلة.</div>';salaryIncreases.querySelectorAll('[data-if]').forEach(e=>e.onchange=()=>{const i=+e.closest('.change-row').dataset.i;state.salaryIncreases[i][e.dataset.if]=e.dataset.if==='amount'?Number(e.value):e.value;save();render()});salaryIncreases.querySelectorAll('[data-idel]').forEach(b=>b.onclick=()=>{state.salaryIncreases.splice(+b.dataset.idel,1);save();renderIncreases();render()})}
-function monthBounds(offset=0){const d=new Date();d.setMonth(d.getMonth()+offset);return{from:iso(new Date(d.getFullYear(),d.getMonth(),1)),to:iso(new Date(d.getFullYear(),d.getMonth()+1,0))}}
-function setPeriod(x){salaryFrom.value=x.from;salaryTo.value=x.to;render()}
-const p=load().period||defaultPeriod();salaryFrom.value=p.from;salaryTo.value=p.to;salaryFrom.onchange=render;salaryTo.onchange=render;thisMonthBtn.onclick=()=>setPeriod(monthBounds(0));lastMonthBtn.onclick=()=>setPeriod(monthBounds(-1));
-document.querySelectorAll('[data-salary-page]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-salary-page]').forEach(x=>x.classList.toggle('active',x===b));const set=b.dataset.salaryPage==='settings';salarySummaryPage.classList.toggle('active',!set);salarySettingsPage.classList.toggle('active',set);if(set)settings();else render()});
-document.querySelectorAll('[data-setting]').forEach(e=>e.onchange=()=>{state=load();const k=e.dataset.setting,n=['baseSalary','socialSecurityBase','takaful','dailyHours','otWorkMultiplier','otHolidayMultiplier','salaryDivisorDays','nightAllowance','sickBalance','casualBalance','transportAllowance','otDivisorHours'].includes(k);state.settings[k]=n?Number(e.value):e.value;save();render()});document.querySelectorAll('[data-percent]').forEach(e=>e.onchange=()=>{state=load();state.settings[e.dataset.percent]=Number(e.value)/100;save();render()});document.querySelectorAll('[data-bool]').forEach(e=>e.onchange=()=>{state=load();state.settings[e.dataset.bool]=e.checked;save();render()});
-addShiftChange.onclick=()=>{state=load();state.shiftChanges.push({effectiveFrom:'',weeklyOff1:state.settings.weeklyOff1,weeklyOff2:state.settings.weeklyOff2,shiftSystem:state.settings.shiftSystem,cycleStartShift:state.settings.cycleStartShift});save();renderChanges()};addSalaryIncrease.onclick=()=>{state=load();state.salaryIncreases.push({effectiveFrom:'',amount:0});save();renderIncreases()};
-exportSalary.onclick=()=>{state=load();S.download(`shifti-attendance-salary-${S.today()}.json`,JSON.stringify(state,null,2))};importSalary.onchange=async()=>{const f=importSalary.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!x.settings||!x.records)throw Error();localStorage.setItem(STORAGE_KEY,JSON.stringify(x));state=load();settings();render();S.toast('تم استيراد البيانات')}catch{alert('ملف غير صالح')}};
+
+function monthBounds(offset=0){
+  const d=new Date();
+  d.setMonth(d.getMonth()+offset);
+  return{
+    from:iso(new Date(d.getFullYear(),d.getMonth(),1)),
+    to:iso(new Date(d.getFullYear(),d.getMonth()+1,0))
+  };
+}
+function setPeriod(x){
+  salaryFrom.value=x.from;
+  salaryTo.value=x.to;
+  render();
+}
+const savedPeriod=load().period||defaultPeriod();
+salaryFrom.value=savedPeriod.from;
+salaryTo.value=savedPeriod.to;
+salaryFrom.addEventListener('change',render);
+salaryTo.addEventListener('change',render);
+thisMonthBtn.addEventListener('click',()=>setPeriod(monthBounds(0)));
+lastMonthBtn.addEventListener('click',()=>setPeriod(monthBounds(-1)));
 render();
