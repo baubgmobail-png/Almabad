@@ -1,5 +1,5 @@
 
-const KEY='almaabad_insurance_balance_app_v1';
+const KEY='insurance_balance_app_v1';
 const TYPES=['صيدلية','مختبر','أشعة'];
 const TYPE_CLASS={'صيدلية':'pharmacy','مختبر':'lab','أشعة':'xray'};
 const TYPE_ICON={'صيدلية':'💊','مختبر':'🧪','أشعة':'🩻'};
@@ -330,4 +330,5 @@ function go(page){
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
 
-
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=7').catch(()=>{}));
+refreshAll();

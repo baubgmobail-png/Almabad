@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="جدول الدوام والإجازات">
 <title>جدول الدوام والإجازات</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
 :root{--navy:#093f91;--blue:#0a6fca;--cyan:#18a4d8;--ink:#16314f;--muted:#6e8499;--bg:#f3f8fc;--card:#fff;--line:#d8e4ef;--red:#c53349;--amber:#d78308;--green:#13865d;--shadow:0 7px 22px rgba(18,77,128,.10)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;min-height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;color:var(--ink)}button,input,select{font:inherit}button{cursor:pointer}
@@ -102,22 +104,8 @@ footer{text-align:center;color:#8294a6;font-size:10px;padding:18px 4px 3px}
 @media(max-width:640px){.compactActions{grid-template-columns:1fr 1fr!important}.monthSettingRow{grid-template-columns:66px 1fr auto}}
 
 </style>
-
-<style id="almaabad-nav-style">
-#almaabadHomeBtn{
- position:fixed;z-index:2147483647;left:10px;top:max(10px,env(safe-area-inset-top));
- display:flex;align-items:center;gap:6px;padding:8px 11px;border-radius:999px;
- text-decoration:none;background:rgba(255,255,255,.94);color:#0b559d;
- border:1px solid rgba(11,85,157,.18);box-shadow:0 5px 16px rgba(25,66,110,.16);
- font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
- backdrop-filter:blur(10px)
-}
-#almaabadHomeBtn:active{transform:scale(.97)}
-</style>
-
-</head>
-<body>
-<a id="almaabadHomeBtn" href="index.html">⌂ المعبد</a>
+<style>#almaabadHomeBtn{position:fixed;z-index:2147483647;left:10px;top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:6px;padding:8px 11px;border-radius:999px;text-decoration:none;background:rgba(255,255,255,.95);color:#0b559d;border:1px solid rgba(11,85,157,.16);box-shadow:0 5px 16px rgba(25,66,110,.14);font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;backdrop-filter:blur(10px)}</style></head>
+<body><a id="almaabadHomeBtn" href="index.html">⌂ المعبد</a>
 <div class="app">
   <header class="top">
     <div class="topline">
@@ -237,7 +225,7 @@ footer{text-align:center;color:#8294a6;font-size:10px;padding:18px 4px 3px}
 const DAYS_AR=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 const uid=()=>Math.random().toString(36).slice(2,9);
 const now=new Date();
-const STORAGE_KEY='almaabad_schedule_qwh_state';
+const STORAGE_KEY='qwh_state';
 const APP_START_MONTH='2026-08';
 const APP_START_DATE=new Date('2026-08-01T12:00:00');
 
@@ -1308,6 +1296,10 @@ function syncStickyTableHeader(){
 window.addEventListener('resize',syncStickyTableHeader);
 window.addEventListener('orientationchange',()=>setTimeout(syncStickyTableHeader,150));
 setTimeout(syncStickyTableHeader,0);
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js?v=7').catch(()=>{});
+}
 
 rebuild();
 

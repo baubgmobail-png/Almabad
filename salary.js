@@ -1,5 +1,5 @@
 
-const STORAGE_KEY = 'almaabad_salary_jadwal_dawam_v2';
+const STORAGE_KEY = 'jadwal_dawam_v2';
 
 const DEFAULT_STATE = {
   version: 2,
@@ -499,4 +499,6 @@ let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').hidden=false;});
 document.getElementById('installBtn').addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;document.getElementById('installBtn').hidden=true;}else{alert('على الآيفون: افتح التطبيق من Safari ثم مشاركة ← إضافة إلى الشاشة الرئيسية.')}});
 
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=7').catch(()=>{})); }
 
+setupNavigation(); initInputs(); setupSettingsEvents(); renderSettings(); renderAttendance(); renderSummary();
