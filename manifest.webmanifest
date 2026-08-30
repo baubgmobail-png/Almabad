@@ -1,6 +1,6 @@
 {
-  "name": "المعبد",
-  "short_name": "المعبد",
+  "name": "Shifti",
+  "short_name": "Shifti",
   "start_url": "./index.html?v=7",
   "scope": "./",
   "display": "standalone",
@@ -19,5 +19,6 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "description": "كل تفاصيل دوامك بمكان واحد"
 }
