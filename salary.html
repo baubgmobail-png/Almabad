@@ -10,9 +10,9 @@
   <title>حساب الراتب</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="salary.css">
-<style>#almaabadHomeBtn{position:fixed;z-index:2147483647;left:10px;top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:6px;padding:8px 11px;border-radius:999px;text-decoration:none;background:rgba(255,255,255,.95);color:#0b559d;border:1px solid rgba(11,85,157,.16);box-shadow:0 5px 16px rgba(25,66,110,.14);font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;backdrop-filter:blur(10px)}</style></head>
-<body><a id="almaabadHomeBtn" href="index.html">⌂ Shifti</a>
+  <link rel="stylesheet" href="salary.css"><link rel="stylesheet" href="shifti-core.css">
+<style>#shiftiHomeBtn{position:fixed;z-index:2147483647;left:10px;top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:6px;padding:8px 11px;border-radius:999px;text-decoration:none;background:rgba(255,255,255,.95);color:#0b559d;border:1px solid rgba(11,85,157,.16);box-shadow:0 5px 16px rgba(25,66,110,.14);font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;backdrop-filter:blur(10px)}</style></head>
+<body><a id="shiftiHomeBtn" href="index.html">⌂ Shifti</a>
   <div id="app">
     <header class="topbar">
       <div>
@@ -182,8 +182,8 @@
           <small class="quick-entry-hint">استخدم الإدخال اليدوي للمغادرة، التأخير، العطلة الرسمية أو عكس الشفت.</small>
         </div>
 
-        <label>الدخول <select id="editIn"></select></label>
-        <label>الخروج <select id="editOut"></select></label>
+        <label>الدخول <input id="editIn" type="time" step="60"></label>
+        <label>الخروج <input id="editOut" type="time" step="60"></label>
         <label>ملاحظات <textarea id="editNotes" rows="3" placeholder="اختياري"></textarea></label>
       </div>
       <div id="dayCalcPreview" class="calc-preview"></div>

@@ -1,11 +1,12 @@
 {
   "name": "Shifti",
   "short_name": "Shifti",
-  "start_url": "./index.html?v=7",
+  "description": "كل تفاصيل دوامك بمكان واحد",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#eef6fc",
-  "theme_color": "#f5f9fd",
+  "background_color": "#f3f7fb",
+  "theme_color": "#0e5fa9",
   "lang": "ar",
   "dir": "rtl",
   "icons": [
@@ -19,6 +20,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "description": "كل تفاصيل دوامك بمكان واحد"
+  ]
 }

@@ -104,8 +104,8 @@ footer{text-align:center;color:#8294a6;font-size:10px;padding:18px 4px 3px}
 @media(max-width:640px){.compactActions{grid-template-columns:1fr 1fr!important}.monthSettingRow{grid-template-columns:66px 1fr auto}}
 
 .brand-badge,.cover-badge{display:grid;place-items:center;background:linear-gradient(135deg,#eef6fc,#dceefe);color:#0b559d;border:1px solid rgba(11,85,157,.12);box-shadow:0 3px 10px rgba(0,67,145,.10)}.brand-badge{width:38px;height:38px;border-radius:11px;font-size:10px;font-weight:900}.cover-badge{width:88px;height:88px;border-radius:14px;font-size:15px;font-weight:900}</style>
-<style>#almaabadHomeBtn{position:fixed;z-index:2147483647;left:10px;top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:6px;padding:8px 11px;border-radius:999px;text-decoration:none;background:rgba(255,255,255,.95);color:#0b559d;border:1px solid rgba(11,85,157,.16);box-shadow:0 5px 16px rgba(25,66,110,.14);font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;backdrop-filter:blur(10px)}</style></head>
-<body><a id="almaabadHomeBtn" href="index.html">⌂ Shifti</a>
+<style>#shiftiHomeBtn{position:fixed;z-index:2147483647;left:10px;top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:6px;padding:8px 11px;border-radius:999px;text-decoration:none;background:rgba(255,255,255,.95);color:#0b559d;border:1px solid rgba(11,85,157,.16);box-shadow:0 5px 16px rgba(25,66,110,.14);font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;backdrop-filter:blur(10px)}</style><style>#shiftiHomeBtn{position:fixed;z-index:2147483647;left:10px;top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:6px;padding:8px 11px;border-radius:999px;text-decoration:none;background:rgba(255,255,255,.96);color:#0e5fa9;border:1px solid rgba(14,95,169,.14);box-shadow:0 5px 16px rgba(13,65,113,.14);font:850 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;backdrop-filter:blur(10px)}.top{background:linear-gradient(180deg,#fbfdff,#f2f8fc)!important}.identity{border-color:#dfe9f2!important}.primary,.applyBtn{background:linear-gradient(135deg,#0e5fa9,#21b7ae)!important}</style></head>
+<body><a id="shiftiHomeBtn" href="index.html">⌂ Shifti</a>
 <div class="app">
   <header class="top">
     <div class="topline">
@@ -1298,7 +1298,7 @@ window.addEventListener('orientationchange',()=>setTimeout(syncStickyTableHeader
 setTimeout(syncStickyTableHeader,0);
 
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js?v=7').catch(()=>{});
+  navigator.serviceWorker.register('./sw.js?v=9').catch(()=>{});
 }
 
 rebuild();

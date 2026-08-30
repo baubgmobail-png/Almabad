@@ -72,3 +72,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0
 .quick-entry.active{background:var(--brand);color:#fff;border-color:var(--brand)}
 .quick-entry-hint{color:var(--muted);line-height:1.6}
 @media(max-width:420px){.quick-entry-grid{grid-template-columns:1fr}.quick-entry{padding:9px}}
+
+/* Shifti v9 unified visual layer */
+:root{--bg:#f3f7fb;--card:#fff;--text:#10253f;--muted:#718198;--line:#dfe9f2;--brand:#0e5fa9;--brand2:#21b7ae;--soft:#e8f5fb;--danger:#c64047;--shadow:0 12px 32px rgba(13,65,113,.085);--radius:20px}.topbar{background:rgba(247,251,254,.9);border-bottom-color:#dfe9f2}.kpi.hero,.summary-total{background:linear-gradient(135deg,#082d5a,#0e5fa9 55%,#21b7ae)}.primary{background:linear-gradient(135deg,#0e5fa9,#1676bd)}.secondary{background:#edf4f9}.bottom-nav{border-top-color:#dfe9f2}.nav-item.active,.link-btn{color:#0e5fa9}.quick-entry.active{background:#0e5fa9;border-color:#0e5fa9}#shiftiHomeBtn{position:fixed;z-index:2147483647;left:10px;top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:6px;padding:8px 11px;border-radius:999px;text-decoration:none;background:rgba(255,255,255,.96);color:#0e5fa9;border:1px solid rgba(14,95,169,.14);box-shadow:0 5px 16px rgba(13,65,113,.14);font-weight:850;font-size:12px;backdrop-filter:blur(10px)}

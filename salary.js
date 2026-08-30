@@ -84,7 +84,7 @@ function dateRange(from,to){
 function fmtDate(s, opts={day:'2-digit',month:'2-digit',year:'numeric'}){ return parseDate(s).toLocaleDateString('ar-JO',opts); }
 function weekday(s){ return WEEKDAYS[parseDate(s).getDay()]; }
 function money(n){ return `${(Number(n)||0).toFixed(3)} د.أ`; }
-function hours(n){ return (Number(n)||0).toFixed(2); }
+function hours(n){ const mins=Math.round((Number(n)||0)*60),h=Math.floor(mins/60),m=mins%60; return m?`${h}س ${m}د`:`${h}س`; }
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
 
 function effectiveShiftConfig(date){
@@ -444,12 +444,12 @@ function initInputs(){
   ['homeFrom','sumFrom'].forEach(id=>document.getElementById(id).value=p.from);
   ['homeTo','sumTo'].forEach(id=>document.getElementById(id).value=p.to);
   document.getElementById('monthPicker').value=p.to.slice(0,7);
-  document.getElementById('editIn').innerHTML=timeOptions(); document.getElementById('editOut').innerHTML=timeOptions();
+  
   ['homeFrom','homeTo'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{document.getElementById('sumFrom').value=document.getElementById('homeFrom').value;document.getElementById('sumTo').value=document.getElementById('homeTo').value;renderSummary()}));
   ['sumFrom','sumTo'].forEach(id=>document.getElementById(id).addEventListener('change',renderSummary));
   document.getElementById('monthPicker').addEventListener('change',renderAttendance);
   document.getElementById('todayMonthBtn').addEventListener('click',()=>{document.getElementById('monthPicker').value=toISODate(new Date()).slice(0,7);renderAttendance()});
-  document.querySelectorAll('#dayModal select,#dayModal textarea').forEach(el=>el.addEventListener('input',updateDayPreview));
+  document.querySelectorAll('#dayModal select,#dayModal textarea,#dayModal input[type="time"]').forEach(el=>el.addEventListener('input',updateDayPreview));
   document.getElementById('closeModal').addEventListener('click',closeDayModal);
   document.getElementById('dayModal').addEventListener('click',e=>{if(e.target.id==='dayModal')closeDayModal()});
   document.querySelectorAll('[data-quick-entry]').forEach(b=>b.addEventListener('click',()=>applyQuickEntry(b.dataset.quickEntry)));
@@ -499,6 +499,6 @@ let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').hidden=false;});
 document.getElementById('installBtn').addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;document.getElementById('installBtn').hidden=true;}else{alert('على الآيفون: افتح التطبيق من Safari ثم مشاركة ← إضافة إلى الشاشة الرئيسية.')}});
 
-if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=7').catch(()=>{})); }
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=9').catch(()=>{})); }
 
 setupNavigation(); initInputs(); setupSettingsEvents(); renderSettings(); renderAttendance(); renderSummary();
