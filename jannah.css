@@ -32,3 +32,24 @@
   .mushaf-page-controls .jn-btn{padding:9px 10px;font-size:9px}
   .mushaf-stage{max-height:75vh}
 }
+
+/* v14: instant offline Quran pages */
+.local-mushaf-stage{
+  background:radial-gradient(circle at 50% 10%,rgba(181,147,80,.10),transparent 34%),linear-gradient(180deg,#f7f0dc,#efe3c5);
+  padding:8px;overflow:auto;min-height:470px;max-height:78vh;
+}
+.local-mushaf-page{
+  --quran-scale:1;width:calc(100% * var(--quran-scale));min-height:660px;margin:0 auto;
+  background:#fffdf3;border:1px solid #d1bd8d;outline:4px double rgba(164,129,62,.28);outline-offset:-9px;
+  border-radius:5px;padding:27px 23px 30px;box-shadow:0 10px 28px rgba(65,50,24,.18);
+  color:#16130e;font-family:"Geeza Pro","Traditional Arabic","Times New Roman",serif;
+  text-align:justify;text-align-last:center;direction:rtl;user-select:text;-webkit-user-select:text;
+}
+.local-mushaf-page .mushaf-page-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;font-size:8px;color:#7e6a45;padding:0 7px 8px;border-bottom:1px solid rgba(169,135,72,.18);margin-bottom:10px}
+.local-mushaf-page .surah-banner{display:flex;align-items:center;justify-content:center;margin:8px auto 7px;padding:7px 12px;width:min(90%,420px);color:#2c4e40;font-family:"Geeza Pro","Traditional Arabic",serif;font-size:18px;font-weight:700;text-align:center;border:1px solid #bda56f;border-radius:999px;background:linear-gradient(90deg,#faf1d5,#fffdf5,#faf1d5)}
+.local-mushaf-page .bismillah-local{text-align:center;font-size:19px;line-height:1.7;padding:2px 0 5px;color:#292014}
+.local-mushaf-page .quran-lines{font-size:22px;line-height:2.05;word-spacing:2px}
+.local-mushaf-page .ayah-local{display:inline}
+.local-mushaf-page .ayah-end{display:inline-flex;align-items:center;justify-content:center;min-width:27px;height:27px;margin:0 3px;vertical-align:middle;border:1px solid #a88b50;border-radius:50%;font-size:10px;color:#725d34;background:#fffaf0}
+.local-mushaf-page .mushaf-page-foot{text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;font-size:9px;color:#8a7957;padding-top:13px}
+@media(max-width:650px){.local-mushaf-page{min-height:610px;padding:22px 17px 27px}.local-mushaf-page .quran-lines{font-size:20px;line-height:2.08}.local-mushaf-page .surah-banner{font-size:17px}.local-mushaf-page .bismillah-local{font-size:18px}}

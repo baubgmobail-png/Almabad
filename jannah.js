@@ -66,38 +66,30 @@ function isMarked(type,surah,ayah,extra=''){
   return state.marks.some(x=>x.id===`${type}:${surah}:${ayah}:${extra}`);
 }
 
-/* ---------- Mushaf pages ---------- */
+/* ---------- Instant local Mushaf pages ---------- */
+const QL=window.QURAN_LOCAL;
 const PAGE_TOTAL=604;
-const PAGE_IMG_BASE='https://surahquran.com/img/pages-quran/';
-const PAGE_FALLBACK_BASE='https://e-quran.com/pic/';
-const SURAH_PAGE_FALLBACK=[
-1,2,50,77,106,128,151,177,187,208,221,235,249,255,262,267,282,293,305,312,
-322,332,342,350,359,367,377,385,396,404,411,415,418,428,434,440,446,453,458,
-467,477,483,489,496,499,502,507,511,515,518,520,523,526,528,531,534,537,542,
-545,549,551,553,554,556,558,560,562,564,566,568,570,572,574,575,577,578,580,
-582,583,585,586,587,587,589,590,591,591,592,593,594,595,595,596,596,597,597,
-598,598,599,599,600,600,601,601,601,602,602,602,603,603,603,604,604,604
-];
-let currentPage=1, zoom=1, imgFallbackUsed=false;
+let currentPage=1, zoom=1;
 let touchStartX=0,touchStartY=0;
 
-function pageUrl(page){
-  return `${PAGE_IMG_BASE}page${String(page).padStart(3,'0')}.png`;
-}
-function fallbackPageUrl(page){
-  return `${PAGE_FALLBACK_BASE}p${page}.jpg`;
-}
-function pageApproxSurah(page){
-  let idx=0;
-  for(let i=0;i<SURAH_PAGE_FALLBACK.length;i++){
-    if(SURAH_PAGE_FALLBACK[i]<=page) idx=i; else break;
+function pageMarked(page){return state.pageMarks.includes(page)}
+function togglePageMark(page){
+  if(pageMarked(page)){
+    state.pageMarks=state.pageMarks.filter(p=>p!==page);
+    J.toast('تم حذف علامة الصفحة');
+  }else{
+    state.pageMarks.unshift(page);
+    J.toast('تم حفظ الصفحة');
   }
-  return idx+1;
+  save();updatePageBookmarkButton();renderMarks();
+}
+function pagePrimarySurah(page){
+  return QL.pages[page-1]?.[0]?.[0]||1;
 }
 function updateResume(){
   let read='لا يوجد';
-  if(state.lastRead?.page) read=`صفحة ${state.lastRead.page} · سورة ${surahName(state.lastRead.surah||pageApproxSurah(state.lastRead.page))}`;
-  else if(state.lastRead?.surah) read=`سورة ${surahName(state.lastRead.surah)}`;
+  if(state.lastRead?.page)read=`صفحة ${state.lastRead.page} · سورة ${surahName(state.lastRead.surah||pagePrimarySurah(state.lastRead.page))}`;
+  else if(state.lastRead?.surah)read=`سورة ${surahName(state.lastRead.surah)}`;
   $('resumeReadText').textContent=read;
   $('resumeTafsirText').textContent=state.lastTafsir?`سورة ${surahName(state.lastTafsir.surah)} · آية ${state.lastTafsir.ayah}`:'لا يوجد';
   $('resumeAudioText').textContent=state.lastAudio?`سورة ${surahName(state.lastAudio.surah)} · آية ${state.lastAudio.ayah||1}`:'لا يوجد';
@@ -107,79 +99,66 @@ function updatePageBookmarkButton(){
   $('bookmarkPage').textContent=pageMarked(currentPage)?'🔖✓':'🔖';
 }
 function updatePageUI(){
-  const approx=pageApproxSurah(currentPage);
+  const s=pagePrimarySurah(currentPage);
   $('pageNumberInput').value=currentPage;
   $('mushafPageTitle').textContent=`صفحة ${currentPage}`;
-  $('mushafPageSurah').textContent=`تقريبًا: سورة ${surahName(approx)}`;
+  $('mushafPageSurah').textContent=`سورة ${surahName(s)}`;
   $('pageCounter').textContent=`${currentPage} / ${PAGE_TOTAL}`;
   $('prevPage').disabled=$('prevPageBottom').disabled=currentPage<=1;
   $('nextPage').disabled=$('nextPageBottom').disabled=currentPage>=PAGE_TOTAL;
   updatePageBookmarkButton();
 }
+function toArabicDigits(n){return String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[+d])}
+function renderLocalPage(page){
+  const verses=QL.pages[page-1]||[];
+  let lastSurah=null,body='';
+  for(const [s,a,text] of verses){
+    if(s!==lastSurah){
+      body+=`<div class="surah-banner">سورة ${surahName(s)}</div>`;
+      if(s!==1&&s!==9&&a===1)body+='<div class="bismillah-local">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>';
+      lastSurah=s;
+    }
+    body+=`<span class="ayah-local">${text} <span class="ayah-end">${toArabicDigits(a)}</span> </span>`;
+  }
+  $('mushafPageText').innerHTML=`<div class="mushaf-page-head"><span>Shifti · القرآن الكريم</span><span>صفحة ${page}</span></div><div class="quran-lines">${body}</div><div class="mushaf-page-foot">${page}</div>`;
+  $('mushafPageText').style.setProperty('--quran-scale',zoom);
+}
 function setZoom(next){
-  zoom=Math.max(1,Math.min(2.25,next));
-  $('mushafImage').style.width=(zoom*100)+'%';
-  if(zoom===1){$('mushafStage').scrollLeft=0}
+  zoom=Math.max(.85,Math.min(1.7,next));
+  $('mushafPageText').style.setProperty('--quran-scale',zoom);
 }
 function showPage(page,{savePosition=true}={}){
   page=Math.max(1,Math.min(PAGE_TOTAL,Number(page)||1));
   currentPage=page;
-  imgFallbackUsed=false;
-  $('mushafLoading').classList.remove('hidden');
-  $('mushafImage').style.opacity='.15';
-  $('mushafImage').src=pageUrl(page);
+  renderLocalPage(page);
   updatePageUI();
-  if(savePosition){
-    const s=pageApproxSurah(page);
-    state.lastRead={page,surah:s,at:new Date().toISOString()};
-    save(); updateResume();
-  }
-  // Preload adjacent pages.
-  [page-1,page+1].filter(p=>p>=1&&p<=PAGE_TOTAL).forEach(p=>{
-    const i=new Image(); i.src=pageUrl(p);
-  });
-}
-$('mushafImage').onload=()=>{
-  $('mushafLoading').classList.add('hidden');
-  $('mushafImage').style.opacity='1';
   $('mushafStage').scrollTop=0;
-};
-$('mushafImage').onerror=()=>{
-  if(!imgFallbackUsed){
-    imgFallbackUsed=true;
-    $('mushafImage').src=fallbackPageUrl(currentPage);
-  }else{
-    $('mushafLoading').textContent='تعذر تحميل صفحة المصحف. تأكد من الإنترنت.';
+  $('mushafStage').scrollLeft=0;
+  if(savePosition){
+    state.lastRead={page,surah:pagePrimarySurah(page),at:new Date().toISOString()};
+    save();updateResume();
   }
-};
-async function openSurahStart(n){
-  let page=SURAH_PAGE_FALLBACK[n-1]||1;
-  try{
-    const d=await fetchSurah(n,'quran-uthmani-quran-academy');
-    const apiPage=d?.ayahs?.[0]?.page;
-    if(apiPage>=1&&apiPage<=604) page=apiPage;
-  }catch{}
-  showPage(page);
 }
+function openSurahStart(n){showPage(QL.surahStartPages[n-1]||1)}
+$('quranSurah').addEventListener('change',()=>openSurahStart(+$('quranSurah').value));
 $('loadQuran').onclick=()=>openSurahStart(+$('quranSurah').value);
 $('prevPage').onclick=$('prevPageBottom').onclick=()=>showPage(currentPage-1);
 $('nextPage').onclick=$('nextPageBottom').onclick=()=>showPage(currentPage+1);
 $('pageNumberInput').onchange=()=>showPage(+$('pageNumberInput').value);
 $('pageNumberInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();showPage(+$('pageNumberInput').value);$('pageNumberInput').blur()}};
-$('zoomIn').onclick=()=>setZoom(zoom+.25);
-$('zoomOut').onclick=()=>setZoom(zoom-.25);
+$('zoomIn').onclick=()=>setZoom(zoom+.1);
+$('zoomOut').onclick=()=>setZoom(zoom-.1);
 $('bookmarkPage').onclick=()=>togglePageMark(currentPage);
 
 $('mushafStage').addEventListener('touchstart',e=>{
   if(e.touches.length!==1)return;
-  touchStartX=e.touches[0].clientX; touchStartY=e.touches[0].clientY;
+  touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;
 },{passive:true});
 $('mushafStage').addEventListener('touchend',e=>{
   if(!e.changedTouches.length||zoom>1.05)return;
-  const dx=e.changedTouches[0].clientX-touchStartX;
-  const dy=e.changedTouches[0].clientY-touchStartY;
-  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.35){
-    if(dx<0) showPage(currentPage+1); else showPage(currentPage-1);
+  const dx=e.changedTouches[0].clientX-touchStartX,dy=e.changedTouches[0].clientY-touchStartY;
+  if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.35){
+    if(dx<0)showPage(currentPage+1);else showPage(currentPage-1);
   }
 },{passive:true});
 
@@ -292,7 +271,7 @@ function renderMarks(){
   if(state.lastRead?.page)rows.push({icon:'📖',title:'آخر قراءة',text:`صفحة ${state.lastRead.page} · سورة ${surahName(state.lastRead.surah||pageApproxSurah(state.lastRead.page))}`,go:'page',page:state.lastRead.page});
   if(state.lastTafsir)rows.push({icon:'📚',title:'آخر تفسير',text:`سورة ${surahName(state.lastTafsir.surah)} · آية ${state.lastTafsir.ayah}`,go:'tafsir'});
   if(state.lastAudio)rows.push({icon:'🎧',title:'آخر استماع',text:`سورة ${surahName(state.lastAudio.surah)} · آية ${state.lastAudio.ayah}`,go:'audio'});
-  state.pageMarks.forEach(page=>rows.push({icon:'🔖',title:'علامة مصحف',text:`صفحة ${page} · سورة ${surahName(pageApproxSurah(page))}`,go:'page',page}));
+  state.pageMarks.forEach(page=>rows.push({icon:'🔖',title:'علامة مصحف',text:`صفحة ${page} · سورة ${surahName(pagePrimarySurah(page))}`,go:'page',page}));
   state.marks.filter(m=>m.type==='tafsir').forEach(m=>rows.push({icon:'🔖',title:'علامة تفسير',text:`سورة ${surahName(m.surah)} · آية ${m.ayah}`,go:'markTafsir',mark:m}));
   $('marksView').innerHTML=rows.length?rows.map((r,i)=>`<div class="jn-card bookmark-card"><span class="bookmark-icon">${r.icon}</span><div><h3>${r.title}</h3><p>${r.text}</p></div><button class="jn-btn secondary" data-go-mark="${i}">فتح</button></div>`).join(''):'<div class="jn-card empty">لا توجد علامات بعد.</div>';
   document.querySelectorAll('[data-go-mark]').forEach(b=>b.onclick=()=>goBookmark(rows[+b.dataset.goMark]));
@@ -313,7 +292,7 @@ function goBookmark(r){
 }
 $('resumeRead').onclick=()=>{
   setTab('quran');
-  const page=state.lastRead?.page || SURAH_PAGE_FALLBACK[(state.lastRead?.surah||1)-1] || 1;
+  const page=state.lastRead?.page || QL.surahStartPages[(state.lastRead?.surah||1)-1] || 1;
   showPage(page);
 };
 $('resumeTafsir').onclick=()=>state.lastTafsir?goBookmark({go:'tafsir'}):setTab('tafsir');
@@ -328,6 +307,6 @@ renderMarks();
 loadReciters();
 if(state.lastTafsir)$('tafsirSurah').value=state.lastTafsir.surah;
 if(state.lastAudio)$('audioSurah').value=state.lastAudio.surah;
-const startPage=state.lastRead?.page || SURAH_PAGE_FALLBACK[(state.lastRead?.surah||1)-1] || 1;
-$('quranSurah').value=state.lastRead?.surah||pageApproxSurah(startPage);
+const startPage=state.lastRead?.page || QL.surahStartPages[(state.lastRead?.surah||1)-1] || 1;
+$('quranSurah').value=state.lastRead?.surah||pagePrimarySurah(startPage);
 showPage(startPage,{savePosition:false});
