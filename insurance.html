@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1769aa">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="رصيد التأمين">
+<title>رصيد التأمين</title>
+<link rel="stylesheet" href="insurance.css">
+
+<style id="almaabad-back-style">
+#almaabadBack{
+ position:fixed;z-index:999999;top:max(10px,env(safe-area-inset-top));left:10px;
+ display:flex;align-items:center;gap:7px;text-decoration:none;
+ color:#0c4d91;background:rgba(255,255,255,.96);border:1px solid rgba(12,77,145,.18);
+ box-shadow:0 6px 18px rgba(13,63,111,.16);border-radius:999px;
+ padding:9px 12px;font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
+ backdrop-filter:blur(9px)
+}
+#almaabadBack:active{transform:scale(.97)}
+</style>
+
+</head>
+<body>
+<a id="almaabadBack" href="index.html" aria-label="العودة إلى المعبد">⌂ <span>المعبد</span></a>
+<header class="topbar">
+  <div>
+    <small>تطبيق شخصي — يعمل بدون إنترنت</small>
+    <h1 id="pageTitle">الرئيسية</h1>
+  </div>
+  <select id="yearSelect" class="year-select" aria-label="السنة"></select>
+</header>
+
+<main>
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div>
+        <span>الزيارات المتبقية</span>
+        <strong id="visitsRemaining">0</strong>
+        <small id="visitsText">من أصل 0 زيارة</small>
+      </div>
+      <div class="ring" id="visitRing"><span id="visitRingText">0%</span></div>
+    </div>
+
+    <div class="kpis">
+      <article><span>إجمالي المرصود</span><strong id="totalCredited">0.000 د.أ</strong></article>
+      <article><span>إجمالي المسحوب</span><strong id="totalUsed">0.000 د.أ</strong></article>
+      <article class="wide"><span>الرصيد المتبقي</span><strong id="totalRemaining">0.000 د.أ</strong></article>
+    </div>
+
+    <div class="section-title"><h2>حسب النوع</h2></div>
+    <div id="categoryCards" class="category-grid"></div>
+
+    <div class="section-title">
+      <h2>آخر العمليات</h2>
+      <button class="link" data-go="transactions">عرض الكل</button>
+    </div>
+    <div id="recentTransactions" class="list"></div>
+  </section>
+
+  <section class="page" id="page-visits">
+    <div class="page-actions">
+      <button class="primary" id="addVisitBtn">+ إضافة زيارة دكتور</button>
+    </div>
+    <div class="info-banner" id="visitBanner"></div>
+    <div id="visitsList" class="list"></div>
+  </section>
+
+  <section class="page" id="page-transactions">
+    <div class="segmented">
+      <button class="seg active" data-filter="all">الكل</button>
+      <button class="seg" data-filter="credit">رصد</button>
+      <button class="seg" data-filter="use">سحب</button>
+    </div>
+    <div class="filters">
+      <select id="typeFilter">
+        <option value="">كل الأنواع</option>
+        <option>صيدلية</option><option>مختبر</option><option>أشعة</option>
+      </select>
+      <select id="providerFilter"><option value="">كل الأماكن</option></select>
+    </div>
+    <div class="page-actions two">
+      <button class="primary" id="quickCreditBtn">+ رصد</button>
+      <button class="secondary" id="quickUseBtn">− سحب</button>
+    </div>
+    <div id="transactionsList" class="list"></div>
+  </section>
+
+  <section class="page" id="page-providers">
+    <div class="page-actions"><button class="primary" id="addProviderBtn">+ إضافة مكان</button></div>
+    <div id="providersList" class="provider-list"></div>
+  </section>
+
+  <section class="page" id="page-settings">
+    <div class="settings-card">
+      <h2>إعدادات السنة</h2>
+      <div class="form-grid">
+        <label>السنة
+          <input type="number" id="settingsYear" min="2020" max="2100">
+        </label>
+        <label>عدد الزيارات السنوية
+          <input type="number" id="annualVisits" min="0" step="1">
+        </label>
+      </div>
+      <button class="primary full" id="saveYearSettings">حفظ إعدادات السنة</button>
+    </div>
+
+    <div class="settings-card">
+      <h2>سنة جديدة</h2>
+      <p class="hint">تقدر تبدأ سنة جديدة بعدد زيارات مختلف، وتبقى بيانات السنوات السابقة محفوظة.</p>
+      <div class="form-grid">
+        <label>السنة الجديدة<input type="number" id="newYear" min="2020" max="2100"></label>
+        <label>عدد الزيارات<input type="number" id="newYearVisits" min="0" value="10"></label>
+      </div>
+      <button class="secondary full" id="createYearBtn">إنشاء سنة</button>
+    </div>
+
+    <div class="settings-card">
+      <h2>النسخ الاحتياطي</h2>
+      <div class="stack">
+        <button class="secondary" id="exportBackup">تصدير نسخة احتياطية JSON</button>
+        <label class="secondary file-label">استيراد نسخة احتياطية<input type="file" id="importBackup" accept=".json,application/json" hidden></label>
+        <button class="danger" id="resetAll">مسح جميع البيانات</button>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h2>تثبيت على الآيفون</h2>
+      <p class="hint">بعد رفع التطبيق على GitHub Pages: افتح الرابط من Safari ← مشاركة ← إضافة إلى الشاشة الرئيسية.</p>
+    </div>
+  </section>
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav active" data-page="home"><span>⌂</span>الرئيسية</button>
+  <button class="nav" data-page="visits"><span>✚</span>الزيارات</button>
+  <button class="nav" data-page="transactions"><span>⇄</span>الحركات</button>
+  <button class="nav" data-page="providers"><span>▣</span>الأماكن</button>
+  <button class="nav" data-page="settings"><span>⚙</span>الإعدادات</button>
+</nav>
+
+<div class="modal" id="visitModal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div><small>زيارة تأمين</small><h2 id="visitModalTitle">إضافة زيارة</h2></div>
+      <button class="close" data-close="visitModal">×</button>
+    </div>
+    <div class="form-grid">
+      <label>التاريخ<input type="date" id="visitDate"></label>
+      <label>اسم الدكتور<input type="text" id="doctorName" placeholder="اختياري"></label>
+    </div>
+    <label class="full-label">ملاحظات<textarea id="visitNotes" rows="2" placeholder="اختياري"></textarea></label>
+
+    <div class="section-title"><h3>الرصيد الناتج عن الزيارة</h3><button class="link" id="addAllocationBtn">+ إضافة رصيد</button></div>
+    <div id="allocationsBox"></div>
+
+    <div class="sheet-actions">
+      <button class="danger ghost" id="deleteVisitBtn" hidden>حذف الزيارة</button>
+      <button class="primary" id="saveVisitBtn">حفظ الزيارة</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="transactionModal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div><small id="transactionModalSub">حركة رصيد</small><h2 id="transactionModalTitle">إضافة حركة</h2></div>
+      <button class="close" data-close="transactionModal">×</button>
+    </div>
+    <div class="form-grid">
+      <label>نوع الحركة
+        <select id="txKind"><option value="credit">رصد</option><option value="use">سحب</option></select>
+      </label>
+      <label>التاريخ<input type="date" id="txDate"></label>
+      <label>النوع
+        <select id="txType"><option>صيدلية</option><option>مختبر</option><option>أشعة</option></select>
+      </label>
+      <label>المكان
+        <select id="txProvider"></select>
+      </label>
+      <label>القيمة بالدينار<input type="number" id="txAmount" step="0.001" min="0"></label>
+      <label>وصف مختصر<input type="text" id="txDescription" placeholder="مثال: دواء ضغط"></label>
+    </div>
+    <label class="full-label">ملاحظات<textarea id="txNotes" rows="2" placeholder="اختياري"></textarea></label>
+    <div id="txBalanceHint" class="balance-hint"></div>
+    <div class="sheet-actions">
+      <button class="danger ghost" id="deleteTxBtn" hidden>حذف الحركة</button>
+      <button class="primary" id="saveTxBtn">حفظ الحركة</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="providerModal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div><small>صيدلية / مختبر / أشعة</small><h2 id="providerModalTitle">إضافة مكان</h2></div>
+      <button class="close" data-close="providerModal">×</button>
+    </div>
+    <div class="form-grid">
+      <label>النوع
+        <select id="providerType"><option>صيدلية</option><option>مختبر</option><option>أشعة</option></select>
+      </label>
+      <label>اسم المكان<input type="text" id="providerName" placeholder="مثال: صيدلية الشفاء"></label>
+    </div>
+    <label class="full-label">ملاحظات<textarea id="providerNotes" rows="2"></textarea></label>
+    <div class="sheet-actions">
+      <button class="danger ghost" id="deleteProviderBtn" hidden>حذف المكان</button>
+      <button class="primary" id="saveProviderBtn">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="insurance.js"></script>
+</body>
+</html>

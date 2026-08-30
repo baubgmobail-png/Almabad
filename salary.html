@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b6e4f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="جدول الدوام">
+  <title>جدول الدوام</title>
+  <link rel="stylesheet" href="salary.css">
+
+<style id="almaabad-back-style">
+#almaabadBack{
+ position:fixed;z-index:999999;top:max(10px,env(safe-area-inset-top));left:10px;
+ display:flex;align-items:center;gap:7px;text-decoration:none;
+ color:#0c4d91;background:rgba(255,255,255,.96);border:1px solid rgba(12,77,145,.18);
+ box-shadow:0 6px 18px rgba(13,63,111,.16);border-radius:999px;
+ padding:9px 12px;font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
+ backdrop-filter:blur(9px)
+}
+#almaabadBack:active{transform:scale(.97)}
+</style>
+
+</head>
+<body>
+<a id="almaabadBack" href="index.html" aria-label="العودة إلى المعبد">⌂ <span>المعبد</span></a>
+  <div id="app">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">تطبيق شخصي — يعمل بدون إنترنت</div>
+        <h1 id="pageTitle">الرئيسية</h1>
+      </div>
+      <button class="icon-btn" id="installBtn" hidden aria-label="تثبيت التطبيق">＋</button>
+    </header>
+    <main>
+      <section class="page active" id="page-home">
+        <div class="period-row">
+          <label>من <input type="date" id="homeFrom"></label>
+          <label>إلى <input type="date" id="homeTo"></label>
+        </div>
+        <div class="kpi-grid">
+          <article class="kpi hero">
+            <span>صافي الراتب</span>
+            <strong id="kpiNet">0.000 د.أ</strong>
+            <small id="kpiPeriod"></small>
+          </article>
+          <article class="kpi"><span>ساعات الإضافي</span><strong id="kpiOtHours">0.00</strong><small id="kpiOtValue">0.000 د.أ</small></article>
+          <article class="kpi"><span>تحتاج مراجعة</span><strong id="kpiReview">0</strong><small>صفوف ناقصة/وقت غير مكتمل</small></article>
+        </div>
+        <div class="section-head">
+          <h2>أقرب أيام الدوام</h2>
+          <button class="link-btn" data-go="attendance">فتح الدوام</button>
+        </div>
+        <div id="upcomingList" class="card-list"></div>
+      </section>
+
+      <section class="page" id="page-attendance">
+        <div class="toolbar-card">
+          <label>الشهر
+            <input type="month" id="monthPicker">
+          </label>
+          <button class="primary small" id="todayMonthBtn">هذا الشهر</button>
+        </div>
+        <div class="legend">
+          <span><i class="dot work"></i>دوام</span>
+          <span><i class="dot off"></i>عطلة</span>
+          <span><i class="dot leave"></i>إجازة</span>
+          <span><i class="dot warn"></i>مراجعة</span>
+        </div>
+        <div id="attendanceList" class="attendance-list"></div>
+      </section>
+
+      <section class="page" id="page-summary">
+        <div class="summary-filter">
+          <label>من <input type="date" id="sumFrom"></label>
+          <label>إلى <input type="date" id="sumTo"></label>
+        </div>
+        <div class="summary-total">
+          <span>صافي الراتب للفترة</span>
+          <strong id="sumNet">0.000 د.أ</strong>
+          <small id="sumDays"></small>
+        </div>
+        <div class="section-head"><h2>حساب الراتب</h2></div>
+        <div id="salaryBreakdown" class="breakdown"></div>
+        <div class="section-head"><h2>إحصائيات الفترة</h2></div>
+        <div id="statsGrid" class="stats-grid"></div>
+      </section>
+
+      <section class="page" id="page-settings">
+        <div class="settings-card">
+          <h2>الراتب والخصومات</h2>
+          <div class="form-grid">
+            <label>الراتب الأساسي <input type="number" step="0.001" data-setting="baseSalary"></label>
+            <label>أساس الضمان <input type="number" step="0.001" data-setting="socialSecurityBase"></label>
+            <label>نسبة الضمان % <input type="number" step="0.01" data-setting-percent="socialSecurityRate"></label>
+            <label>صندوق الادخار % <input type="number" step="0.01" data-setting-percent="savingsRate"></label>
+            <label>تكافل ثابت <input type="number" step="0.001" data-setting="takaful"></label>
+            <label>بدل المواصلات <input type="number" step="0.001" data-setting="transportAllowance"></label>
+            <label>بدل المسائي <input type="number" step="0.001" data-setting="nightAllowance"></label>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h2>نظام الدوام</h2>
+          <div class="form-grid">
+            <label>الساعات اليومية <input type="number" step="0.1" data-setting="dailyHours"></label>
+            <label>معامل إضافي الدوام <input type="number" step="0.01" data-setting="otWorkMultiplier"></label>
+            <label>معامل إضافي العطلة <input type="number" step="0.01" data-setting="otHolidayMultiplier"></label>
+            <label>أيام قسمة الراتب <input type="number" step="1" data-setting="salaryDivisorDays"></label>
+            <label>ساعات قسمة الإضافي <input type="number" step="0.1" data-setting="otDivisorHours"></label>
+            <label>العطلة الأسبوعية 1 <select data-setting="weeklyOff1" class="weekday-select"></select></label>
+            <label>العطلة الأسبوعية 2 <select data-setting="weeklyOff2" class="weekday-select"></select></label>
+            <label>نظام الشفت
+              <select data-setting="shiftSystem">
+                <option>تناوب أسبوعي</option><option>صباحي فقط</option><option>مسائي فقط</option>
+              </select>
+            </label>
+            <label>بداية التناوب
+              <select data-setting="cycleStartShift"><option>صباحي</option><option>مسائي</option></select>
+            </label>
+            <label>تاريخ بداية التناوب <input type="date" data-setting="cycleStartDate"></label>
+            <label>رصيد المرضي <input type="number" step="1" data-setting="sickBalance"></label>
+            <label>رصيد العرضي <input type="number" step="1" data-setting="casualBalance"></label>
+          </div>
+          <div class="toggle-row">
+            <label><input type="checkbox" data-setting-bool="deductAbsence"> احتساب خصم الغياب</label>
+            <label><input type="checkbox" data-setting-bool="deductShortage"> احتساب خصم المغادرة</label>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="section-head"><h2>تغييرات العطل والشفت</h2><button class="primary small" id="addShiftChange">إضافة</button></div>
+          <div id="shiftChanges"></div>
+        </div>
+
+        <div class="settings-card">
+          <div class="section-head"><h2>زيادات الراتب</h2><button class="primary small" id="addSalaryIncrease">إضافة</button></div>
+          <p class="hint">الزيادة تُطبّق من تاريخ السريان فقط، والفترات السابقة تبقى كما هي.</p>
+          <div id="salaryIncreases"></div>
+        </div>
+
+        <div class="settings-card">
+          <h2>النسخ الاحتياطي</h2>
+          <div class="actions-stack">
+            <button class="secondary" id="exportBackup">تصدير نسخة احتياطية JSON</button>
+            <label class="secondary file-btn">استيراد نسخة احتياطية<input type="file" id="importBackup" accept=".json,application/json" hidden></label>
+            <button class="danger" id="resetData">مسح كل البيانات وإعادة الافتراضي</button>
+          </div>
+        </div>
+
+        <div class="settings-card install-help">
+          <h2>تثبيت على الآيفون</h2>
+          <p>بعد رفع الملفات على GitHub Pages: افتح الرابط من Safari ← زر المشاركة ← «إضافة إلى الشاشة الرئيسية».</p>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-page="home"><span>⌂</span>الرئيسية</button>
+      <button class="nav-item" data-page="attendance"><span>▦</span>الدوام</button>
+      <button class="nav-item" data-page="summary"><span>≡</span>الملخص</button>
+      <button class="nav-item" data-page="settings"><span>⚙</span>الإعدادات</button>
+    </nav>
+  </div>
+
+  <div class="modal" id="dayModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div><small id="modalDayName"></small><h2 id="modalDate"></h2></div>
+        <button class="icon-btn" id="closeModal">×</button>
+      </div>
+      <div class="form-grid one">
+        <label>نوع اليوم
+          <select id="editDayType">
+            <option value="">تلقائي</option>
+            <option>دوام</option><option>عطلة أسبوعية</option><option>عطلة رسمية</option>
+            <option>إجازة مرضية</option><option>إجازة عرضية</option><option>غياب</option>
+          </select>
+        </label>
+        <label>الشفت
+          <select id="editShift">
+            <option value="">تلقائي</option><option>صباحي</option><option>مسائي</option><option>عطلة</option>
+          </select>
+        </label>
+
+        <div class="quick-entry-wrap">
+          <span class="quick-entry-label">اختصار الإدخال</span>
+          <div class="quick-entry-grid">
+            <button type="button" class="quick-entry" data-quick-entry="normal">دوام كامل</button>
+            <button type="button" class="quick-entry" data-quick-entry="extra">كامل + إضافي</button>
+            <button type="button" class="quick-entry" data-quick-entry="manual">إدخال يدوي</button>
+          </div>
+          <small class="quick-entry-hint">استخدم الإدخال اليدوي للمغادرة، التأخير، العطلة الرسمية أو عكس الشفت.</small>
+        </div>
+
+        <label>الدخول <select id="editIn"></select></label>
+        <label>الخروج <select id="editOut"></select></label>
+        <label>ملاحظات <textarea id="editNotes" rows="3" placeholder="اختياري"></textarea></label>
+      </div>
+      <div id="dayCalcPreview" class="calc-preview"></div>
+      <div class="modal-actions">
+        <button class="danger ghost" id="clearDay">مسح إدخال اليوم</button>
+        <button class="primary" id="saveDay">حفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="salary.js"></script>
+</body>
+</html>

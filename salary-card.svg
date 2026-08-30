@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 270">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#edf9f1"/><stop offset="1" stop-color="#e3f0ff"/></linearGradient></defs>
+<rect width="420" height="270" rx="36" fill="url(#g)"/>
+<rect x="48" y="92" width="155" height="98" rx="22" fill="#155baa"/><rect x="65" y="67" width="118" height="70" rx="14" fill="#52a774"/>
+<text x="124" y="111" font-family="Arial" font-weight="700" font-size="40" text-anchor="middle" fill="white">$</text>
+<rect x="232" y="54" width="112" height="151" rx="18" fill="#fff" stroke="#155baa" stroke-width="6"/>
+<rect x="250" y="73" width="76" height="30" rx="6" fill="#dbeeff"/>
+<g fill="#155baa"><rect x="250" y="116" width="20" height="20" rx="4"/><rect x="279" y="116" width="20" height="20" rx="4"/><rect x="308" y="116" width="20" height="20" rx="4"/><rect x="250" y="145" width="20" height="20" rx="4"/><rect x="279" y="145" width="20" height="20" rx="4"/><rect x="308" y="145" width="20" height="20" rx="4"/></g>
+<g fill="#e6aa32"><circle cx="94" cy="207" r="27"/><circle cx="138" cy="214" r="25"/><circle cx="181" cy="205" r="23"/></g></svg>

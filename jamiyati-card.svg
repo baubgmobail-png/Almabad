@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 270">
+<rect width="420" height="270" rx="36" fill="#eef9f3"/>
+<circle cx="210" cy="112" r="68" fill="#fff" stroke="#45a672" stroke-width="6"/>
+<rect x="175" y="91" width="70" height="82" rx="23" fill="#f7fbff" stroke="#2d72b7" stroke-width="5"/>
+<g fill="#e4aa34"><circle cx="195" cy="150" r="13"/><circle cx="225" cy="150" r="13"/><circle cx="210" cy="125" r="13"/></g>
+<path d="M210 55c23 0 43 11 55 30-15 2-29 10-39 22-10-12-16-28-16-52z" fill="#63b878"/>
+<text x="210" y="225" text-anchor="middle" font-size="48" font-weight="800" fill="#185fa8" font-family="Tahoma,Arial">جمعياتي</text></svg>

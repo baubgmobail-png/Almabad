@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#12483e"><title>جمعياتي</title><link rel="stylesheet" href="jamiyati.css">
+</head><body>
+<a id="almaabadBack" href="index.html">⌂ <span>المعبد</span></a>
+<main class="app-shell">
+<div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+<header class="topbar"><div class="brand-mark">ج</div><div><p class="eyebrow">دفعاتك بترتيب</p><h1>جمعياتي</h1></div><button class="add-button" id="addBtn"><span>＋</span> جمعية جديدة</button></header>
+<section class="hero"><div class="hero-copy"><span class="month-pill" id="monthPill"></span><h2>كل جمعياتك،<br><em>قدّام عيونك.</em></h2><p>تابع دفعاتك الشهرية ودور استلامك بسهولة، بدون دفاتر ولا نسيان.</p></div><div class="summary-card"><p>المتبقي عليك هذا الشهر</p><strong id="due">0 <small>د.أ</small></strong><div class="summary-split"><div><span>جمعيات فعّالة</span><b id="activeCount">0</b></div><div><span>تم دفعه</span><b id="paidNow">0 د.أ</b></div></div></div></section>
+<section class="associations-section"><div class="section-heading"><div><span class="section-kicker">القائمة</span><h2>جمعياتي الشهرية</h2></div><span class="count-badge" id="countBadge">0 جمعية</span></div><div id="content"></div></section>
+<footer><span class="privacy-dot"></span> بياناتك محفوظة داخل نسخة المعبد فقط<small>نسخة مستقلة عن تطبيق جمعياتي القديم</small></footer>
+</main>
+<div class="modal-backdrop" id="modal" hidden><section class="form-sheet"><div class="form-heading"><div><span class="section-kicker">جمعية جديدة</span><h2>أدخل تفاصيل الجمعية</h2></div><button id="closeBtn">×</button></div>
+<form id="form"><label class="field full"><span>اسم الجمعية</span><input id="fName" required placeholder="مثلاً: جمعية العائلة"></label><div class="form-grid">
+<label class="field"><span>بتبلّش من</span><input id="fStart" required type="month"></label>
+<label class="field"><span>عدد الشهور</span><input id="fDuration" required type="number" min="1" max="120" value="12"></label>
+<label class="field"><span>رقم دورك</span><input id="fTurn" required type="number" min="1" max="120" value="1"></label>
+<label class="field"><span>قيمة الدفعة الشهرية</span><div class="input-with-unit"><input id="fMonthly" required type="number" min="0.01" step="0.01" placeholder="100"><i>د.أ</i></div></label>
+<label class="field full"><span>قيمة الجمعية كاملة (اختياري)</span><div class="input-with-unit"><input id="fTotal" type="number" min="0" step="0.01" placeholder="تُحسب تلقائياً"><i>د.أ</i></div></label>
+</div><div class="form-preview"><span>موعد استلامك المتوقع</span><strong id="preview">—</strong></div><button class="save-button" type="submit">حفظ الجمعية</button></form></section></div>
+<script src="jamiyati.js"></script></body></html>
