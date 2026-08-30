@@ -499,6 +499,4 @@ let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').hidden=false;});
 document.getElementById('installBtn').addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;document.getElementById('installBtn').hidden=true;}else{alert('على الآيفون: افتح التطبيق من Safari ثم مشاركة ← إضافة إلى الشاشة الرئيسية.')}});
 
-)); }
 
-setupNavigation(); initInputs(); setupSettingsEvents(); renderSettings(); renderAttendance(); renderSummary();
