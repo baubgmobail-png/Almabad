@@ -47,3 +47,10 @@ v21:
 - تحقق مباشر من نجاح localStorage بعد الضغط على حفظ.
 - حفظ تلقائي عند pagehide / background / beforeunload / الرجوع إلى Shifti.
 - صفحة جديدة schedule-v21.html لتجاوز كاش schedule.html القديم نهائياً.
+
+v22:
+- إصلاح loadState الذي كان يصفر monthPlans عند كل فتح.
+- عدم حذف الإجازات/OFF اليدوية والملاحظات واليوم السادس أثناء migration.
+- 4 نسخ تخزين متزامنة + تحقق من الأربع.
+- آخر 5 حالات محفوظة محلياً.
+- schedule-v22.html لتجاوز كاش Safari القديم.
