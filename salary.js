@@ -23,20 +23,25 @@ const SHIFT_RULES={صباحي:{normalStart:'07:00',normalEnd:'17:30',otStart:'17
 function defaultPeriod(){const d=new Date(),y=d.getFullYear(),m=d.getMonth();return{from:iso(new Date(y,m,1)),to:iso(new Date(y,m+1,0))}}
 function clone(x){return JSON.parse(JSON.stringify(x))}function load(){try{const x=JSON.parse(localStorage.getItem(STORAGE_KEY));return x?{...clone(DEFAULT_STATE),...x,settings:{...DEFAULT_STATE.settings,...(x.settings||{})},records:x.records||{},shiftChanges:x.shiftChanges||[],salaryIncreases:x.salaryIncreases||[]}:clone(DEFAULT_STATE)}catch{return clone(DEFAULT_STATE)}}let state=load();function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
 function iso(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}function pd(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}function add(s,n){const d=pd(s);d.setDate(d.getDate()+n);return iso(d)}function diff(a,b){return Math.round((pd(a)-pd(b))/86400000)}function range(a,b){const x=[];if(!a||!b||a>b)return x;for(let d=a;d<=b;d=add(d,1))x.push(d);return x}function wd(s){return WEEKDAYS[pd(s).getDay()]}function money(n){return`${(Number(n)||0).toFixed(3)} د.أ`}function hm(h){const m=Math.max(0,Math.round((Number(h)||0)*60));return`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`}
-function cfg(date){let c={weeklyOff1:state.settings.weeklyOff1,weeklyOff2:state.settings.weeklyOff2,shiftSystem:state.settings.shiftSystem,cycleStartShift:state.settings.cycleStartShift,cycleStartDate:state.settings.cycleStartDate};[...(state.shiftChanges||[])].filter(x=>x.effectiveFrom&&x.effectiveFrom<=date).sort((a,b)=>a.effectiveFrom.localeCompare(b.effectiveFrom)).forEach(x=>{c={...c,weeklyOff1:x.weeklyOff1||c.weeklyOff1,weeklyOff2:x.weeklyOff2||c.weeklyOff2,shiftSystem:x.shiftSystem||c.shiftSystem}});return c}
+function cfg(date){let c={weeklyOff1:state.settings.weeklyOff1,weeklyOff2:state.settings.weeklyOff2,shiftSystem:state.settings.shiftSystem,cycleStartShift:state.settings.cycleStartShift,cycleStartDate:state.settings.cycleStartDate};[...(state.shiftChanges||[])].filter(x=>x.effectiveFrom&&x.effectiveFrom<=date).sort((a,b)=>a.effectiveFrom.localeCompare(b.effectiveFrom)).forEach(x=>{c={...c,weeklyOff1:x.weeklyOff1||c.weeklyOff1,weeklyOff2:x.weeklyOff2||c.weeklyOff2,shiftSystem:x.shiftSystem||c.shiftSystem,cycleStartShift:x.cycleStartShift||c.cycleStartShift,cycleStartDate:x.effectiveFrom||c.cycleStartDate}});return c}
 function autoType(date){const c=cfg(date),w=wd(date);return w===c.weeklyOff1||w===c.weeklyOff2?'عطلة أسبوعية':'دوام'}
 function flipShift(sh){return sh==='صباحي'?'مسائي':'صباحي'}
 function rotatingShift(date){
-  const anchor=state.settings.cycleStartDate||date;
-  let current=state.settings.cycleStartShift==='صباحي'?'صباحي':'مسائي';
-  if(date<=anchor)return current;
-  let prev=anchor,seenWork=autoType(anchor)==='دوام';
-  for(let d=add(anchor,1);d<=date;d=add(d,1)){
+  const c=cfg(date);
+  const anchor=c.cycleStartDate||date;
+  let current=c.cycleStartShift==='صباحي'?'صباحي':'مسائي';
+
+  let firstWork=null;
+  for(let d=anchor;d<=date;d=add(d,1)){
+    if(autoType(d)==='دوام'){firstWork=d;break}
+  }
+  if(!firstWork)return current;
+  if(date<=firstWork)return current;
+
+  let prev=firstWork;
+  for(let d=add(firstWork,1);d<=date;d=add(d,1)){
     const prevType=autoType(prev),curType=autoType(d);
-    if(curType==='دوام'){
-      if(seenWork&&prevType==='عطلة أسبوعية')current=flipShift(current);
-      seenWork=true;
-    }
+    if(curType==='دوام'&&prevType==='عطلة أسبوعية')current=flipShift(current);
     prev=d;
   }
   return current;

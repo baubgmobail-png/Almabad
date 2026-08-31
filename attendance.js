@@ -15,10 +15,26 @@ function load(){
 }
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 function cfg(date){
-  let c={weeklyOff1:state.settings.weeklyOff1,weeklyOff2:state.settings.weeklyOff2,shiftSystem:state.settings.shiftSystem,cycleStartShift:state.settings.cycleStartShift,cycleStartDate:state.settings.cycleStartDate};
-  [...(state.shiftChanges||[])].filter(x=>x.effectiveFrom&&x.effectiveFrom<=date).sort((a,b)=>a.effectiveFrom.localeCompare(b.effectiveFrom)).forEach(x=>{
-    c={...c,weeklyOff1:x.weeklyOff1||c.weeklyOff1,weeklyOff2:x.weeklyOff2||c.weeklyOff2,shiftSystem:x.shiftSystem||c.shiftSystem};
-  });
+  let c={
+    weeklyOff1:state.settings.weeklyOff1,
+    weeklyOff2:state.settings.weeklyOff2,
+    shiftSystem:state.settings.shiftSystem,
+    cycleStartShift:state.settings.cycleStartShift,
+    cycleStartDate:state.settings.cycleStartDate
+  };
+  [...(state.shiftChanges||[])]
+    .filter(x=>x.effectiveFrom&&x.effectiveFrom<=date)
+    .sort((a,b)=>a.effectiveFrom.localeCompare(b.effectiveFrom))
+    .forEach(x=>{
+      c={
+        ...c,
+        weeklyOff1:x.weeklyOff1||c.weeklyOff1,
+        weeklyOff2:x.weeklyOff2||c.weeklyOff2,
+        shiftSystem:x.shiftSystem||c.shiftSystem,
+        cycleStartShift:x.cycleStartShift||c.cycleStartShift,
+        cycleStartDate:x.effectiveFrom||c.cycleStartDate
+      };
+    });
   return c;
 }
 function wd(date){return WEEK[S.parseDate(date).getDay()]}
@@ -30,22 +46,22 @@ function dateAdd(s,n){
 }
 function flipShift(sh){return sh==='صباحي'?'مسائي':'صباحي'}
 function rotatingShift(date){
-  const anchor=state.settings.cycleStartDate||date;
-  let current=state.settings.cycleStartShift==='صباحي'?'صباحي':'مسائي';
-  // The configured starting shift belongs to the first work block from the anchor onward.
-  // For historical dates before the anchor, keep the configured starting shift.
-  if(date<=anchor)return current;
+  const c=cfg(date);
+  const anchor=c.cycleStartDate||date;
+  let current=c.cycleStartShift==='صباحي'?'صباحي':'مسائي';
 
-  let prev=anchor;
-  let seenWork=dayType(anchor)==='دوام';
+  // The selected starting shift applies to the first WORK block at/after this change date.
+  let firstWork=null;
+  for(let d=anchor;d<=date;d=dateAdd(d,1)){
+    if(dayType(d)==='دوام'){firstWork=d;break}
+  }
+  if(!firstWork)return current;
+  if(date<=firstWork)return current;
 
-  for(let d=dateAdd(anchor,1);d<=date;d=dateAdd(d,1)){
+  let prev=firstWork;
+  for(let d=dateAdd(firstWork,1);d<=date;d=dateAdd(d,1)){
     const prevType=dayType(prev),curType=dayType(d);
-    if(curType==='دوام'){
-      // Critical rule: shift changes only when work resumes after one or more OFF days.
-      if(seenWork&&prevType==='عطلة أسبوعية')current=flipShift(current);
-      seenWork=true;
-    }
+    if(curType==='دوام'&&prevType==='عطلة أسبوعية')current=flipShift(current);
     prev=d;
   }
   return current;

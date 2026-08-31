@@ -53,9 +53,9 @@
 <label class="sf-field"><span>نظام الشفت</span><select data-setting="shiftSystem"><option>تناوب أسبوعي</option><option>صباحي فقط</option><option>مسائي فقط</option></select></label>
 <label class="sf-field"><span>بداية التناوب</span><select data-setting="cycleStartShift"><option>صباحي</option><option>مسائي</option></select></label>
 <label class="sf-field"><span>تاريخ بداية التناوب</span><input type="date" data-setting="cycleStartDate"></label>
-</div><div class="setting-note">تستخدم هذه المعلومات لتجهيز صفحة الحضور تلقائياً. في نظام التناوب، الشفت لا يتغير بين يومي دوام متتاليين؛ يتقلب فقط بعد العطلة.</div></section>
+</div><div class="setting-note">تستخدم هذه المعلومات لتجهيز صفحة الحضور تلقائياً. كل تغيير عطلة يبدأ دورة جديدة حسب النظام والشفت الذي تحدده.</div></section>
 
-<section class="sf-card settings-group"><div class="sf-section-head"><h2 style="margin:0">تغييرات العطل</h2><button type="button" class="sf-btn sf-secondary" id="addShiftChange">＋ إضافة</button></div><div id="shiftChanges"></div></section>
+<section class="sf-card settings-group"><div class="sf-section-head"><h2 style="margin:0">تغييرات العطل ونظام الشفت</h2><button type="button" class="sf-btn sf-secondary" id="addShiftChange">＋ إضافة</button></div><div id="shiftChanges"></div></section>
 <section class="sf-card settings-group"><div class="sf-section-head"><h2 style="margin:0">زيادات الراتب</h2><button type="button" class="sf-btn sf-secondary" id="addSalaryIncrease">＋ إضافة</button></div><div id="salaryIncreases"></div></section>
 
 <section class="sf-card settings-group"><h2>نسخة احتياطية لبيانات الحضور والراتب</h2><div class="sf-actions"><button type="button" class="sf-btn sf-secondary" id="exportSalary">تصدير نسخة</button><label class="sf-btn sf-secondary" style="cursor:pointer">استيراد نسخة<input id="importSalary" type="file" accept="application/json" hidden></label></div></section>
