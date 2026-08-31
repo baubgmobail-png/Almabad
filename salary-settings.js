@@ -34,7 +34,7 @@ function renderChanges(){
   <label>عطلة 1<select data-change="weeklyOff1">${WEEKDAYS.map(w=>`<option value="${w}" ${w===x.weeklyOff1?'selected':''}>${w}</option>`).join('')}</select></label>
   <label>عطلة 2<select data-change="weeklyOff2">${WEEKDAYS.map(w=>`<option value="${w}" ${w===x.weeklyOff2?'selected':''}>${w}</option>`).join('')}</select></label>
   <label>النظام<select data-change="shiftSystem"><option ${x.shiftSystem==='تناوب أسبوعي'?'selected':''}>تناوب أسبوعي</option><option ${x.shiftSystem==='صباحي فقط'?'selected':''}>صباحي فقط</option><option ${x.shiftSystem==='مسائي فقط'?'selected':''}>مسائي فقط</option></select></label>
-  <label>بداية الشفت<select data-change="cycleStartShift"><option ${x.cycleStartShift==='صباحي'?'selected':''}>صباحي</option><option ${x.cycleStartShift==='مسائي'?'selected':''}>مسائي</option></select></label>
+  
   <button type="button" class="delete-mini" data-delete-change="${i}">حذف</button></div>`).join('');
   box.querySelectorAll('[data-change]').forEach(el=>el.addEventListener('change',()=>{const i=Number(el.closest('.change-row').dataset.index);state.shiftChanges[i][el.dataset.change]=el.value;saveState()}));
   box.querySelectorAll('[data-delete-change]').forEach(btn=>btn.addEventListener('click',()=>{state.shiftChanges.splice(Number(btn.dataset.deleteChange),1);saveState();renderChanges()}));
@@ -50,7 +50,7 @@ function renderIncreases(){
   box.querySelectorAll('[data-delete-increase]').forEach(btn=>btn.addEventListener('click',()=>{state.salaryIncreases.splice(Number(btn.dataset.deleteIncrease),1);saveState();renderIncreases()}));
 }
 
-$('addShiftChange').addEventListener('click',()=>{collectForm();state.shiftChanges.push({effectiveFrom:'',weeklyOff1:state.settings.weeklyOff1,weeklyOff2:state.settings.weeklyOff2,shiftSystem:state.settings.shiftSystem,cycleStartShift:state.settings.cycleStartShift});saveState();renderChanges()});
+$('addShiftChange').addEventListener('click',()=>{collectForm();state.shiftChanges.push({effectiveFrom:'',weeklyOff1:state.settings.weeklyOff1,weeklyOff2:state.settings.weeklyOff2,shiftSystem:state.settings.shiftSystem});saveState();renderChanges()});
 $('addSalaryIncrease').addEventListener('click',()=>{state.salaryIncreases.push({effectiveFrom:'',amount:0});saveState();renderIncreases()});
 $('saveSettingsBtn').addEventListener('click',saveAll);
 $('exportSalary').addEventListener('click',()=>{collectForm();saveState();S.download(`shifti-attendance-salary-${S.today()}.json`,JSON.stringify(state,null,2))});

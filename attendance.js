@@ -17,20 +17,45 @@ function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 function cfg(date){
   let c={weeklyOff1:state.settings.weeklyOff1,weeklyOff2:state.settings.weeklyOff2,shiftSystem:state.settings.shiftSystem,cycleStartShift:state.settings.cycleStartShift,cycleStartDate:state.settings.cycleStartDate};
   [...(state.shiftChanges||[])].filter(x=>x.effectiveFrom&&x.effectiveFrom<=date).sort((a,b)=>a.effectiveFrom.localeCompare(b.effectiveFrom)).forEach(x=>{
-    c={...c,weeklyOff1:x.weeklyOff1||c.weeklyOff1,weeklyOff2:x.weeklyOff2||c.weeklyOff2,shiftSystem:x.shiftSystem||c.shiftSystem,cycleStartShift:x.cycleStartShift||c.cycleStartShift,cycleStartDate:x.effectiveFrom||c.cycleStartDate};
+    c={...c,weeklyOff1:x.weeklyOff1||c.weeklyOff1,weeklyOff2:x.weeklyOff2||c.weeklyOff2,shiftSystem:x.shiftSystem||c.shiftSystem};
   });
   return c;
 }
 function wd(date){return WEEK[S.parseDate(date).getDay()]}
 function dayType(date){const c=cfg(date),w=wd(date);return w===c.weeklyOff1||w===c.weeklyOff2?'عطلة أسبوعية':'دوام'}
-function diffDays(a,b){return Math.round((S.parseDate(a)-S.parseDate(b))/86400000)}
+function dateAdd(s,n){
+  const d=S.parseDate(s);
+  d.setDate(d.getDate()+n);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function flipShift(sh){return sh==='صباحي'?'مسائي':'صباحي'}
+function rotatingShift(date){
+  const anchor=state.settings.cycleStartDate||date;
+  let current=state.settings.cycleStartShift==='صباحي'?'صباحي':'مسائي';
+  // The configured starting shift belongs to the first work block from the anchor onward.
+  // For historical dates before the anchor, keep the configured starting shift.
+  if(date<=anchor)return current;
+
+  let prev=anchor;
+  let seenWork=dayType(anchor)==='دوام';
+
+  for(let d=dateAdd(anchor,1);d<=date;d=dateAdd(d,1)){
+    const prevType=dayType(prev),curType=dayType(d);
+    if(curType==='دوام'){
+      // Critical rule: shift changes only when work resumes after one or more OFF days.
+      if(seenWork&&prevType==='عطلة أسبوعية')current=flipShift(current);
+      seenWork=true;
+    }
+    prev=d;
+  }
+  return current;
+}
 function shift(date,type=dayType(date)){
   if(type.includes('عطلة'))return'عطلة';
   const c=cfg(date);
   if(c.shiftSystem==='صباحي فقط')return'صباحي';
   if(c.shiftSystem==='مسائي فقط')return'مسائي';
-  const w=Math.floor(diffDays(date,c.cycleStartDate)/7),even=((w%2)+2)%2===0;
-  return even?c.cycleStartShift:(c.cycleStartShift==='صباحي'?'مسائي':'صباحي');
+  return rotatingShift(date);
 }
 function minute(t){if(!t)return null;const[h,m]=t.split(':').map(Number);return h*60+m}
 function mins(a,b){if(!a||!b)return 0;let x=minute(b)-minute(a);if(x<0)x+=1440;return x}
